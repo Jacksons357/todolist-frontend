@@ -52,7 +52,7 @@ Uma aplicação completa de gerenciamento de tarefas e projetos construída com 
 
 1. Clone o repositório:
 ```bash
-git clone [<url-do-repositorio>](https://github.com/Jacksons357/todolist-frontend)
+git clone https://github.com/Jacksons357/todolist-frontend
 cd todolist-frontend
 ```
 
