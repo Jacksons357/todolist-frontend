@@ -2,8 +2,8 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  created_at: string;
-  updated_at: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface Project {
@@ -14,6 +14,7 @@ export interface Project {
   user_id: string;
   created_at: string;
   updated_at: string;
+  todos?: Todo[];
 }
 
 export interface Todo {
@@ -21,12 +22,16 @@ export interface Todo {
   title: string;
   description?: string;
   completed: boolean;
-  due_date?: string;
-  priority?: 'low' | 'medium' | 'high';
-  project_id?: string;
-  user_id: string;
-  created_at: string;
-  updated_at: string;
+  dueDate?: string;
+  note?: string;
+  projectId?: string;
+  userId: string;
+  createdAt: string;
+  updatedAt: string;
+  project?: {
+    id: string;
+    name: string;
+  };
   subtasks?: Subtask[];
 }
 
@@ -40,8 +45,12 @@ export interface Subtask {
 }
 
 export interface AuthResponse {
-  user: User;
-  token: string;
+  success: boolean;
+  data: {
+    user: User;
+    token: string;
+  };
+  message: string;
 }
 
 export interface LoginCredentials {
@@ -64,9 +73,9 @@ export interface CreateProjectData {
 export interface CreateTodoData {
   title: string;
   description?: string;
-  due_date?: string;
-  priority?: 'low' | 'medium' | 'high';
-  project_id?: string;
+  dueDate?: string;
+  note?: string;
+  projectId?: string;
 }
 
 export interface CreateSubtaskData {
@@ -76,4 +85,14 @@ export interface CreateSubtaskData {
 export interface ApiError {
   message: string;
   status?: number;
+}
+
+export interface ApiErrorResponse {
+  message: string;
+  status?: number;
+  response?: {
+    data?: {
+      message?: string;
+    };
+  };
 } 

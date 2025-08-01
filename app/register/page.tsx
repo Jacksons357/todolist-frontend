@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
+import { ApiErrorResponse } from '@/lib/types';
 
 export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -107,7 +108,9 @@ export default function RegisterPage() {
 
             {registerMutation.error && (
               <div className="p-3 text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-md">
-                {registerMutation.error.message || 'Erro ao criar conta'}
+                {(registerMutation.error as ApiErrorResponse)?.response?.data?.message || 
+                 registerMutation.error.message || 
+                 'Erro ao criar conta'}
               </div>
             )}
 

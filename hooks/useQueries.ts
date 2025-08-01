@@ -14,12 +14,22 @@ import {
 } from '@/lib/types';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 // Hooks para projetos
 export const useProjects = () => {
   return useQuery({
     queryKey: ['projects'],
     queryFn: projectsApi.getAll,
+    select: (data) => Array.isArray(data) ? data : [],
+  });
+};
+
+export const useProject = (id: string) => {
+  return useQuery({
+    queryKey: ['project', id],
+    queryFn: () => projectsApi.getById(id),
+    enabled: !!id,
   });
 };
 
@@ -30,6 +40,11 @@ export const useCreateProject = () => {
     mutationFn: projectsApi.create,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projects'] });
+      toast.success('Projeto criado com sucesso!');
+    },
+    onError: (error) => {
+      toast.error('Erro ao criar projeto. Tente novamente.');
+      console.error('Erro ao criar projeto:', error);
     },
   });
 };
@@ -42,6 +57,11 @@ export const useUpdateProject = () => {
       projectsApi.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projects'] });
+      toast.success('Projeto atualizado com sucesso!');
+    },
+    onError: (error) => {
+      toast.error('Erro ao atualizar projeto. Tente novamente.');
+      console.error('Erro ao atualizar projeto:', error);
     },
   });
 };
@@ -54,6 +74,11 @@ export const useDeleteProject = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['projects'] });
       queryClient.invalidateQueries({ queryKey: ['todos'] });
+      toast.success('Projeto excluído com sucesso!');
+    },
+    onError: (error) => {
+      toast.error('Erro ao excluir projeto. Tente novamente.');
+      console.error('Erro ao excluir projeto:', error);
     },
   });
 };
@@ -63,6 +88,15 @@ export const useTodos = () => {
   return useQuery({
     queryKey: ['todos'],
     queryFn: todosApi.getAll,
+    select: (data) => Array.isArray(data) ? data : [],
+  });
+};
+
+export const useTodo = (id: string) => {
+  return useQuery({
+    queryKey: ['todo', id],
+    queryFn: () => todosApi.getById(id),
+    enabled: !!id,
   });
 };
 
@@ -71,6 +105,7 @@ export const useTodosByProject = (projectId: string) => {
     queryKey: ['todos', 'project', projectId],
     queryFn: () => todosApi.getByProject(projectId),
     enabled: !!projectId,
+    select: (data) => Array.isArray(data) ? data : [],
   });
 };
 
@@ -81,6 +116,11 @@ export const useCreateTodo = () => {
     mutationFn: todosApi.create,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['todos'] });
+      toast.success('Tarefa criada com sucesso!');
+    },
+    onError: (error) => {
+      toast.error('Erro ao criar tarefa. Tente novamente.');
+      console.error('Erro ao criar tarefa:', error);
     },
   });
 };
@@ -93,6 +133,11 @@ export const useUpdateTodo = () => {
       todosApi.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['todos'] });
+      toast.success('Tarefa atualizada com sucesso!');
+    },
+    onError: (error) => {
+      toast.error('Erro ao atualizar tarefa. Tente novamente.');
+      console.error('Erro ao atualizar tarefa:', error);
     },
   });
 };
@@ -104,6 +149,11 @@ export const useDeleteTodo = () => {
     mutationFn: todosApi.delete,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['todos'] });
+      toast.success('Tarefa excluída com sucesso!');
+    },
+    onError: (error) => {
+      toast.error('Erro ao excluir tarefa. Tente novamente.');
+      console.error('Erro ao excluir tarefa:', error);
     },
   });
 };
@@ -115,6 +165,11 @@ export const useCompleteTodo = () => {
     mutationFn: todosApi.complete,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['todos'] });
+      toast.success('Tarefa marcada como concluída!');
+    },
+    onError: (error) => {
+      toast.error('Erro ao marcar tarefa como concluída. Tente novamente.');
+      console.error('Erro ao marcar tarefa como concluída:', error);
     },
   });
 };
@@ -128,6 +183,11 @@ export const useCreateSubtask = () => {
       subtasksApi.create(todoId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['todos'] });
+      toast.success('Subtarefa criada com sucesso!');
+    },
+    onError: (error) => {
+      toast.error('Erro ao criar subtarefa. Tente novamente.');
+      console.error('Erro ao criar subtarefa:', error);
     },
   });
 };
@@ -139,6 +199,11 @@ export const useDeleteSubtask = () => {
     mutationFn: subtasksApi.delete,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['todos'] });
+      toast.success('Subtarefa excluída com sucesso!');
+    },
+    onError: (error) => {
+      toast.error('Erro ao excluir subtarefa. Tente novamente.');
+      console.error('Erro ao excluir subtarefa:', error);
     },
   });
 };
@@ -150,6 +215,11 @@ export const useCompleteSubtask = () => {
     mutationFn: subtasksApi.complete,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['todos'] });
+      toast.success('Subtarefa marcada como concluída!');
+    },
+    onError: (error) => {
+      toast.error('Erro ao marcar subtarefa como concluída. Tente novamente.');
+      console.error('Erro ao marcar subtarefa como concluída:', error);
     },
   });
 };
@@ -161,9 +231,16 @@ export const useLogin = () => {
   
   return useMutation({
     mutationFn: authApi.login,
-    onSuccess: (data) => {
-      login(data.user, data.token);
-      router.push('/dashboard');
+    onSuccess: (response) => {
+      if (response.success) {
+        login(response.data.user, response.data.token);
+        router.push('/dashboard');
+        toast.success('Login realizado com sucesso!');
+      }
+    },
+    onError: (error) => {
+      toast.error('Erro ao fazer login. Verifique suas credenciais.');
+      console.error('Erro no login:', error);
     },
   });
 };
@@ -174,9 +251,16 @@ export const useRegister = () => {
   
   return useMutation({
     mutationFn: authApi.register,
-    onSuccess: (data) => {
-      login(data.user, data.token);
-      router.push('/dashboard');
+    onSuccess: (response) => {
+      if (response.success) {
+        login(response.data.user, response.data.token);
+        router.push('/dashboard');
+        toast.success('Conta criada com sucesso!');
+      }
+    },
+    onError: (error) => {
+      toast.error('Erro ao criar conta. Tente novamente.');
+      console.error('Erro no registro:', error);
     },
   });
 }; 

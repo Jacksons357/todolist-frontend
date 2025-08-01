@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
 import { User } from '@/lib/types';
+import { toast } from 'sonner';
 
 interface AuthContextType {
   user: User | null;
@@ -43,9 +44,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsLoading(false);
   }, []);
 
-  const login = (userData: User, token: string) => {
+  const login = async (userData: User, token: string | Promise<string>) => {
     setUser(userData);
-    Cookies.set('token', token, { expires: 7 }); // 7 dias
+    const resolvedToken = await token;
+    Cookies.set('token', resolvedToken, { expires: 7 }); // 7 dias
     Cookies.set('user', JSON.stringify(userData), { expires: 7 });
   };
 
@@ -53,6 +55,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(null);
     Cookies.remove('token');
     Cookies.remove('user');
+    toast.success('Logout realizado com sucesso!');
   };
 
   const value: AuthContextType = {

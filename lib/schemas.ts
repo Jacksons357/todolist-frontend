@@ -24,9 +24,9 @@ export const projectSchema = z.object({
 export const todoSchema = z.object({
   title: z.string().min(1, 'Título da tarefa é obrigatório'),
   description: z.string().optional(),
-  due_date: z.string().optional(),
-  priority: z.enum(['low', 'medium', 'high']).optional(),
-  project_id: z.string().optional(),
+  dueDate: z.string().optional(),
+  note: z.string().optional(),
+  projectId: z.string().optional(),
 });
 
 export const subtaskSchema = z.object({

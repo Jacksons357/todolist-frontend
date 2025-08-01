@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
+import { ApiErrorResponse } from '@/lib/types';
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -73,7 +74,9 @@ export default function LoginPage() {
 
             {loginMutation.error && (
               <div className="p-3 text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-md">
-                {loginMutation.error.message || 'Erro ao fazer login'}
+                {(loginMutation.error as ApiErrorResponse)?.response?.data?.message || 
+                 loginMutation.error.message || 
+                 'Erro ao fazer login'}
               </div>
             )}
 
